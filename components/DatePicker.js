@@ -34,12 +34,12 @@ export default class DatePicker extends Component {
     };
     this.getDate = this.getDate.bind(this);
     this.getDateStr = this.getDateStr.bind(this);
+    this._datePicked = this._datePicked.bind(this);
     this._onPressButton = this._onPressButton.bind(this);
     this._onDatePicked = this._onDatePicked.bind(this);
     this._onTimePicked = this._onTimePicked.bind(this);
     this._onDatetimePicked = this._onDatetimePicked.bind(this);
     this._onDatetimeTimePicked = this._onDatetimeTimePicked.bind(this);
-    this._onDateChange = this._onDateChange.bind(this);
     this._onPressCancel = this._onPressCancel.bind(this);
   }
 
@@ -74,6 +74,13 @@ export default class DatePicker extends Component {
     } else {
       return Moment(this.getDate(date)).format(format);
     }
+  }
+
+  _datePicked(date) {
+    console.log('>>> DatePicker _datePicked', date);
+    this.setState({
+      date: date
+    });
   }
 
   _is24Hour(format) {
@@ -120,11 +127,10 @@ export default class DatePicker extends Component {
 
   _onDatePicked({action, year, month, day}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      // TODO: call to _onDateChange?
-      this.setState({
+      /* this.setState({
         date: new Date(year, month, day),
-      });
-      // this.datePicked();
+      }); */
+      this._datePicked(new Date(year, month, day));
     } else {
       this._onPressCancel();
     }
@@ -132,11 +138,10 @@ export default class DatePicker extends Component {
 
   _onTimePicked({action, hour, minute}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      // TODO: call to _onDateChange?
-      this.setState({
+      /* this.setState({
         date: Moment().hour(hour).minute(minute).toDate(),
-      });
-      // this.datePicked();
+      }); */
+      this._datePicked(Moment().hour(hour).minute(minute).toDate());
     } else {
       this._onPressCancel();
     }
@@ -158,19 +163,13 @@ export default class DatePicker extends Component {
 
   _onDatetimeTimePicked(year, month, day, {action, hour, minute}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      // TODO: call to _onDateChange?
-      this.setState({
+      /* this.setState({
         date: new Date(year, month, day, hour, minute),
-      });
+      }); */
+      this._datePicked(new Date(year, month, day, hour, minute));
     } else {
       this._onPressCancel();
     }
-  }
-
-  _onDateChange(date) {
-    this.setState({
-      date: date
-    });
   }
 
   _onPressCancel() {
@@ -210,7 +209,7 @@ export default class DatePicker extends Component {
               mode={mode}
               // minimumDate={minDate && this.getDate(minDate)}
               // maximumDate={maxDate && this.getDate(maxDate)}
-              onDateChange={this._onDateChange}
+              onDateChange={this._datePicked}
               // minuteInterval={minuteInterval}
               // timeZoneOffsetInMinutes={timeZoneOffsetInMinutes}
               style={[ styles.datePicker ]}

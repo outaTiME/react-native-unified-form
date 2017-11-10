@@ -45,17 +45,18 @@ export default class App extends Component {
                   />
                 </View>
                 <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Fecha y hora</Text>
+                  <Text numberOfLines={1} style={styles.field_label}>Fecha y hora de llegada</Text>
                   <DatePicker
                     disabled={disabled}
                     defaultValue="foo #1"
                   />
                 </View>
                 <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Tiempo (minutos)</Text>
+                  <Text numberOfLines={1} style={styles.field_label}>Duración (minutos)</Text>
                   <TextInput
                     disabled={disabled}
                     keyboardType="numeric"
+                    defaultValue="5"
                   />
                 </View>
                 <View style={[ styles.field, ]}>
