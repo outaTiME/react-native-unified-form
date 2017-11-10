@@ -32,9 +32,9 @@ export default class App extends Component {
         <View style={{ flexGrow: 1, }}>
           <KeyboardAvoidingView behavior='padding' keyboardVerticalOffset={Constants.statusBarHeight} style={{ flex: 1, }}>
             <ScrollView>
-              <View style={styles.readonly}>
+              {disabled && <View style={styles.readonly}>
                 <Text style={{ textAlign: 'center' }}>La visita actual ya ha sido confirmada y no puede ser modificada.</Text>
-              </View>
+              </View>}
               <View style={{ margin: Layout.CONTAINER_PADDING, }}>
                 <View style={[ styles.field, ]}>
                   <Text numberOfLines={1} style={styles.field_label}>Cliente</Text>
