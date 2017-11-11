@@ -7,6 +7,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { colors } from "../config/colors";
 import Layout from '../config/layout'
 
 const SUPPORTED_ORIENTATIONS = ['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right'];
@@ -85,19 +86,17 @@ export default class ModalPicker extends Component {
   onPressCancel() {
     console.log('>>> ModalPicker onPressCancel');
     this.setVisible(false);
-    /* if (typeof this.props.onCloseModal === 'function') {
-      this.props.onCloseModal();
-    } */
+    if (typeof this.props.onCancel === 'function') {
+      this.props.onCancel();
+    }
   }
 
   onPressConfirm() {
     console.log('>>> ModalPicker onPressConfirm');
-    // this.datePicked();
-    // TODO: how to send data to parent?
     this.setVisible(false);
-    /* if (typeof this.props.onCloseModal === 'function') {
-      this.props.onCloseModal();
-    } */
+    if (typeof this.props.onConfirm === 'function') {
+      this.props.onConfirm();
+    }
   }
 
   show() {
@@ -141,7 +140,9 @@ export default class ModalPicker extends Component {
               style={[ styles.pickerCon, { height: this.state.animatedHeight } ]}
             >
               <View style={{ flex: 1 }}/* pointerEvents={this.state.allowPointerEvents ? 'auto' : 'none'} */>
-                {children}
+                <View style={styles.contentContainer}>
+                  {children}
+                </View>
               </View>
               <TouchableComponent
                 underlayColor={'transparent'}
@@ -212,5 +213,10 @@ const styles = StyleSheet.create({
   },
   btnConfirm: {
     right: 0,
+  },
+  contentContainer: {
+    marginTop: 42,
+    borderTopColor: colors.divider,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

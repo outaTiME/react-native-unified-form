@@ -17,6 +17,15 @@ import Layout from './config/layout'
 export default class App extends Component {
   state = {
     disabled: false,
+    // TODO: took date from arrival
+    arrival: new Date(),
+    // TODO: took from departure - arrival
+    duration: '5',
+    packages: '1',
+    // fixed data
+    waypoint: {
+      packages: 1,
+    }
   };
   _enableInputs() {
     this.setState({ disabled: false });
@@ -26,7 +35,7 @@ export default class App extends Component {
   }
   render() {
     console.log('>>> App render()');
-    const disabled = this.state.disabled;
+    const { disabled, arrival, duration, packages, waypoint } = this.state;
     return (
       <View style={styles.container}>
         <View style={{ flexGrow: 1, }}>
@@ -47,24 +56,36 @@ export default class App extends Component {
                 <View style={[ styles.field, ]}>
                   <Text numberOfLines={1} style={styles.field_label}>Fecha y hora de llegada</Text>
                   <DatePicker
+                    date={arrival}
                     disabled={disabled}
-                    defaultValue="foo #1"
+                    onDateChange={(date) => {
+                      console.log('>>> App onDateChange', date);
+                      this.setState({
+                        arrival: date
+                      });
+                    }}
                   />
                 </View>
                 <View style={[ styles.field, ]}>
                   <Text numberOfLines={1} style={styles.field_label}>Duración (minutos)</Text>
                   <TextInput
+                    value={duration}
                     disabled={disabled}
                     keyboardType="numeric"
-                    defaultValue="5"
+                    onChangeText={(text) => this.setState({
+                      duration: text
+                    })}
                   />
                 </View>
                 <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Paquetes (1)</Text>
+                  <Text numberOfLines={1} style={styles.field_label}>Paquetes ({waypoint.packages})</Text>
                   <TextInput
+                    value={packages}
                     disabled={disabled}
                     keyboardType="numeric"
-                    defaultValue="1"
+                    onChangeText={(text) => this.setState({
+                      packages: text
+                    })}
                   />
                 </View>
                 <View style={[ styles.field, { marginBottom: 0 } ]}>

@@ -8,6 +8,7 @@ import {
   TimePickerAndroid,
   DatePickerAndroid,
   DatePickerIOS,
+  Keyboard,
 } from 'react-native';
 import TextInput from './TextInput.js';
 import ModalPicker from './ModalPicker.js';
@@ -16,7 +17,7 @@ import { colors } from "../config/colors";
 import Layout from '../config/layout'
 
 const FORMATS = {
-  // 'date': 'YYYY-MM-DD',
+  'date': 'DD/MM/YY',
   'datetime': 'DD/MM/YY HH:mm',
   'time': 'HH:mm'
 };
@@ -40,7 +41,17 @@ export default class DatePicker extends Component {
     this._onTimePicked = this._onTimePicked.bind(this);
     this._onDatetimePicked = this._onDatetimePicked.bind(this);
     this._onDatetimeTimePicked = this._onDatetimeTimePicked.bind(this);
+    this._onDateChange = this._onDateChange.bind(this);
     this._onPressCancel = this._onPressCancel.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.date !== this.props.date) {
+      console.log('>>> DatePicker componentWillReceiveProps', nextProps.date);
+      this.setState({
+        date: this.getDate(nextProps.date),
+      });
+    }
   }
 
   getDate(date = this.props.date) {
@@ -76,11 +87,11 @@ export default class DatePicker extends Component {
     }
   }
 
-  _datePicked(date) {
-    console.log('>>> DatePicker _datePicked', date);
-    this.setState({
-      date: date
-    });
+  _datePicked() {
+    const { date } = this.state;
+    if (typeof this.props.onDateChange === 'function') {
+      this.props.onDateChange(date);
+    }
   }
 
   _is24Hour(format) {
@@ -93,6 +104,12 @@ export default class DatePicker extends Component {
       console.log('>>> DatePicker disabled, ignoring events');
     } else {
       console.log('>>> DatePicker _onPressButton');
+      // Keyboard.dismiss();
+      // reset state
+      this.setState({
+        date: this.getDate()
+      });
+      // check for modal
       const modal = this._modal;
       if (modal) {
         // iOS
@@ -127,10 +144,10 @@ export default class DatePicker extends Component {
 
   _onDatePicked({action, year, month, day}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      /* this.setState({
+      this.setState({
         date: new Date(year, month, day),
-      }); */
-      this._datePicked(new Date(year, month, day));
+      });
+      this._datePicked();
     } else {
       this._onPressCancel();
     }
@@ -138,10 +155,10 @@ export default class DatePicker extends Component {
 
   _onTimePicked({action, hour, minute}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      /* this.setState({
+      this.setState({
         date: Moment().hour(hour).minute(minute).toDate(),
-      }); */
-      this._datePicked(Moment().hour(hour).minute(minute).toDate());
+      });
+      this._datePicked();
     } else {
       this._onPressCancel();
     }
@@ -163,13 +180,30 @@ export default class DatePicker extends Component {
 
   _onDatetimeTimePicked(year, month, day, {action, hour, minute}) {
     if (action !== DatePickerAndroid.dismissedAction) {
-      /* this.setState({
+      this.setState({
         date: new Date(year, month, day, hour, minute),
-      }); */
-      this._datePicked(new Date(year, month, day, hour, minute));
+      });
+      this._datePicked();
     } else {
       this._onPressCancel();
     }
+  }
+
+  _onDateChange(date) {
+    this.setState({
+      date: date
+    });
+    /*
+    this.setState({
+      allowPointerEvents: false,
+      date: date
+    });
+    const timeoutId = setTimeout(() => {
+      this.setState({
+        allowPointerEvents: true
+      });
+      clearTimeout(timeoutId);
+    }, 200); */
   }
 
   _onPressCancel() {
@@ -180,8 +214,13 @@ export default class DatePicker extends Component {
       console.log('>>> DatePicker _onPressCancel (iOS)');
       modal.hide();
     } else {
-      // ???
+      // android
+      console.log('>>> DatePicker _onPressCancel (android)');
     }
+    // reset state
+    /* this.setState({
+      date: this.getDate(),
+    }); */
   }
 
   /*
@@ -193,8 +232,7 @@ export default class DatePicker extends Component {
 
   render() {
     console.log('>>> DatePicker render()');
-    const { mode, ...attributes } = this.props;
-    const { date } = this.state;
+    const { mode, date, ...attributes } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this._onPressButton}>
         <View>
@@ -203,16 +241,25 @@ export default class DatePicker extends Component {
             {...attributes}
             value={this.getDateStr(date)}
           />
-           {Platform.OS === 'ios' && <ModalPicker ref={component => this._modal = component}>
+           {Platform.OS === 'ios' && <ModalPicker
+            ref={component => this._modal = component}
+            onCancel={() => {
+              console.log('>>> DatePicker ModalPicker onCancel');
+              this._onPressCancel();
+            }}
+            onConfirm={() => {
+              console.log('>>> DatePicker ModalPicker onConfirm');
+              this._datePicked();
+            }}>
             <DatePickerIOS
-              date={date}
+              date={this.state.date}
               mode={mode}
               // minimumDate={minDate && this.getDate(minDate)}
               // maximumDate={maxDate && this.getDate(maxDate)}
-              onDateChange={this._datePicked}
+              onDateChange={this._onDateChange}
               // minuteInterval={minuteInterval}
               // timeZoneOffsetInMinutes={timeZoneOffsetInMinutes}
-              style={[ styles.datePicker ]}
+              // style={[ styles.datePicker ]}
             />
           </ModalPicker>}
         </View>
@@ -222,6 +269,7 @@ export default class DatePicker extends Component {
 }
 
 const styles = StyleSheet.create({
+  // TODO: export to modal
   datePicker: {
     marginTop: 42,
     borderTopColor: colors.divider,
