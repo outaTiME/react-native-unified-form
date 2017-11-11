@@ -17,9 +17,9 @@ export default class ModalPicker extends Component {
   static defaultProps = {
     visible: false,
     cancelBtnText: 'Cancelar',
-    confirmBtnText: 'Aceptar',
-    // component height: 216(DatePickerIOS) + 1(borderTop) + 42(marginTop), IOS only
-    height: 259,
+    confirmBtnText: 'Done',
+    // component height: 216(DatePickerIOS) + 1(borderTop) + 44(marginTop), IOS only
+    height: 261,
     // slide animation duration time, default to 300ms, IOS only
     duration: 300,
     TouchableComponent: TouchableHighlight,
@@ -47,6 +47,7 @@ export default class ModalPicker extends Component {
 
   setVisible(visible) {
     const {height, duration} = this.props;
+    console.log('>>> ModalPicker setVisible', visible, height, duration);
     // slide animation
     if (visible) {
       this.setState({ visible: visible });
@@ -160,7 +161,7 @@ export default class ModalPicker extends Component {
                 onPress={this.onPressConfirm}
                 style={[ styles.btnText, styles.btnConfirm ]}
               >
-                <Text style={[ styles.btnTextText ]}>{confirmBtnText}</Text>
+                <Text style={[ styles.btnTextText, styles.btnTextConfirm ]}>{confirmBtnText}</Text>
               </TouchableComponent>
             </Animated.View>
           </TouchableComponent>
@@ -188,25 +189,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#00000077',
   },
   pickerCon: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
+    backgroundColor: '#F9F9F9',
     height: 0,
     overflow: 'hidden',
+    // borderTopColor: '#B2B2B2',
+    // borderTopWidth: 1,
   },
   btnText: {
     position: 'absolute',
     top: 0,
-    height: 42,
+    height: 44,
     padding: Layout.CONTAINER_PADDING,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   btnTextText: {
-    fontSize: 16,
-    color: '#46cf98',
+    // https://ivomynttinen.com/blog/ios-design-guidelines
+    // https://developer.apple.com/ios/human-interface-guidelines/visual-design/typography/
+    fontSize: 17,
+    // color: '#46cf98',
+    color: '#0076FF',
   },
   btnTextCancel: {
-    color: '#666',
+    // color: '#0076FF',
+  },
+  btnTextConfirm: {
+    // TODO: export to settings
+    /*
+    { fontWeight: '100' }, // Thin
+    { fontWeight: '200' }, // Ultra Light
+    { fontWeight: '300' }, // Light
+    { fontWeight: '400' }, // Regular
+    { fontWeight: '500' }, // Medium
+    { fontWeight: '600' }, // Semibold
+    { fontWeight: '700' }, // Bold
+    { fontWeight: '800' }, // Heavy
+    { fontWeight: '900' }, // Black
+    */
+    fontWeight: '600', // Semibold
   },
   btnCancel: {
     left: 0,
@@ -215,8 +237,10 @@ const styles = StyleSheet.create({
     right: 0,
   },
   contentContainer: {
-    marginTop: 42,
-    borderTopColor: colors.divider,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 44,
+    borderColor: colors.divider,
+    borderWidth: StyleSheet.hairlineWidth,
+    // backgroundColor: '#D2D5DB'
+    backgroundColor: colors.lightDivider,
   },
 });

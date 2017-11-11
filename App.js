@@ -7,25 +7,20 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Button,
 } from 'react-native';
 import { Constants } from 'expo';
 import TextInput from './components/TextInput.js';
 import DatePicker from './components/DatePicker.js';
 import { colors } from "./config/colors";
 import Layout from './config/layout'
+import { Formik } from 'formik';
+import Yup from 'yup';
+import Moment from 'moment';
 
 export default class App extends Component {
   state = {
     disabled: false,
-    // TODO: took date from arrival
-    arrival: new Date(),
-    // TODO: took from departure - arrival
-    duration: '5',
-    packages: '1',
-    // fixed data
-    waypoint: {
-      packages: 1,
-    }
   };
   _enableInputs() {
     this.setState({ disabled: false });
@@ -35,68 +30,117 @@ export default class App extends Component {
   }
   render() {
     console.log('>>> App render()');
-    const { disabled, arrival, duration, packages, waypoint } = this.state;
+    const arrival = new Date();
+    // TODO: took default from rels ?
+    const duration = 5;
+    const departure = Moment(arrival).add(duration, 'minutes').toDate();
+    // Moment(values.departure).diff(values.arrival, 'minutes')
+    const packages = 9;
+    const { disabled, } = this.state;
     return (
       <View style={styles.container}>
         <View style={{ flexGrow: 1, }}>
-          <KeyboardAvoidingView behavior='padding' keyboardVerticalOffset={Constants.statusBarHeight} style={{ flex: 1, }}>
-            <ScrollView>
-              {disabled && <View style={styles.readonly}>
-                <Text style={{ textAlign: 'center' }}>La visita actual ya ha sido confirmada y no puede ser modificada.</Text>
-              </View>}
-              <View style={{ margin: Layout.CONTAINER_PADDING, }}>
-                <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Cliente</Text>
-                  <TextInput
-                    // always disabled
-                    disabled
-                    defaultValue="EFFIO CROVETTO, FELIPE ALBERTO"
-                  />
-                </View>
-                <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Fecha y hora de llegada</Text>
-                  <DatePicker
-                    date={arrival}
-                    disabled={disabled}
-                    onDateChange={(date) => {
-                      console.log('>>> App onDateChange', date);
-                      this.setState({
-                        arrival: date
-                      });
-                    }}
-                  />
-                </View>
-                <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Duración (minutos)</Text>
-                  <TextInput
-                    value={duration}
-                    disabled={disabled}
-                    keyboardType="numeric"
-                    onChangeText={(text) => this.setState({
-                      duration: text
-                    })}
-                  />
-                </View>
-                <View style={[ styles.field, ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Paquetes ({waypoint.packages})</Text>
-                  <TextInput
-                    value={packages}
-                    disabled={disabled}
-                    keyboardType="numeric"
-                    onChangeText={(text) => this.setState({
-                      packages: text
-                    })}
-                  />
-                </View>
-                <View style={[ styles.field, { marginBottom: 0 } ]}>
-                  <Text numberOfLines={1} style={styles.field_label}>Notas</Text>
-                  <TextInput
-                    disabled={disabled}
-                  />
-                </View>
-              </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
+          <Formik
+            initialValues={{
+              // TODO: took data from waypoint
+              status: 1,
+              customer: 'EFFIO CROVETTO, FELIPE ALBERTO',
+              arrival: arrival,
+              // departure: departure,
+              duration: duration,
+              packages: packages,
+              // notes: '',
+            }}
+            /* validateOnChange={false}
+            validationSchema={Yup.object().shape({
+              departure: Yup.number().required().positive().integer(),
+              packages: Yup.number().required().positive().integer(),
+            })} */
+            onSubmit={(
+              values,
+              { setSubmitting, setErrors /* setValues and other goodies */ }
+            ) => {
+              console.log('>>> Form values', values);
+              setTimeout(() => {
+                setSubmitting(false);
+              }, 2 * 1000);
+            }}
+            render={({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+              setFieldValue,
+            }) => (
+              <KeyboardAvoidingView behavior='padding' keyboardVerticalOffset={Constants.statusBarHeight} style={{ flex: 1, }}>
+                <ScrollView>
+                  {disabled && <View style={styles.readonly}>
+                    <Text style={{ textAlign: 'center' }}>La visita actual ya ha sido confirmada y no puede ser modificada.</Text>
+                  </View>}
+                  <View style={{ margin: Layout.CONTAINER_PADDING, }}>
+                    <View style={[ styles.field, ]}>
+                      <Text numberOfLines={1} style={styles.field_label}>Cliente</Text>
+                      <TextInput
+                        // always disabled
+                        disabled
+                        defaultValue={values.customer}
+                      />
+                    </View>
+                    <View style={[ styles.field, ]}>
+                      <Text numberOfLines={1} style={styles.field_label}>Fecha y hora de llegada</Text>
+                      <DatePicker
+                        date={values.arrival}
+                        maxDate={new Date()}
+                        disabled={disabled}
+                        onDateChange={date => setFieldValue('arrival', date)}
+                        error={touched.arrival && errors.arrival}
+                      />
+                    </View>
+                    <View style={[ styles.field, ]}>
+                      <Text numberOfLines={1} style={styles.field_label}>Duración (minutos)</Text>
+                      <TextInput
+                        value={`${values.duration}`}
+                        disabled={disabled}
+                        keyboardType="numeric"
+                        onChangeText={text => setFieldValue('duration', text)}
+                        error={touched.duration && errors.duration}
+                      />
+                    </View>
+                    <View style={[ styles.field, ]}>
+                      <Text numberOfLines={1} style={styles.field_label}>Paquetes ({packages})</Text>
+                      <TextInput
+                        value={`${values.packages}`}
+                        disabled={disabled}
+                        keyboardType="numeric"
+                        onChangeText={text => setFieldValue('packages', text)}
+                        error={touched.packages && errors.packages}
+                      />
+                    </View>
+                    <View style={[ styles.field, { marginBottom: 0 } ]}>
+                      <Text numberOfLines={1} style={styles.field_label}>Notas</Text>
+                      <TextInput
+                        value={values.notes}
+                        disabled={disabled}
+                        onChangeText={text => setFieldValue('notes', text)}
+                        error={touched.notes && errors.notes}
+                      />
+                    </View>
+                  </View>
+                  <Button onPress={(e) => {
+                    setFieldValue('status', 3)
+                    handleSubmit(e);
+                  }} title="Confirmar" disabled={isSubmitting} />
+                  <Button onPress={(e) => {
+                    setFieldValue('status', 4)
+                    handleSubmit(e);
+                  }} title="Rechazar" disabled={isSubmitting} />
+                </ScrollView>
+              </KeyboardAvoidingView>
+            )}
+          />
         </View>
         <View style={styles.actionBar}>
           <TouchableOpacity style={[ styles.button, { marginRight: 8 }]} onPress={this._enableInputs.bind(this)}>

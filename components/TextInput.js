@@ -15,13 +15,14 @@ export default class TextInput extends Component {
   }
 
   render() {
-    const { style, disabled, readonly, ...attributes } = this.props;
+    const { style, disabled, readonly, error, ...attributes } = this.props;
     const editable = !disabled && !readonly;
     const props = {
       style: [
         style,
         styles.textInput,
         disabled === true && styles.textInputDisabled,
+        error && styles.textError,
       ],
       underlineColorAndroid: 'transparent',
       ...attributes,
@@ -48,5 +49,10 @@ const styles = StyleSheet.create({
   },
   textInputDisabled: {
     backgroundColor: colors.lightDivider,
-  }
+  },
+  textError: {
+    // TODO: export same as ActionButton
+    borderColor: '#C0392B',
+    borderWidth: 1,
+  },
 });

@@ -118,12 +118,12 @@ export default class DatePicker extends Component {
       } else {
         // android
         console.log('>>> DatePicker _onPressButton (android)');
-         const {mode, format = FORMATS[mode], /* minDate, maxDate, */ is24Hour = this._is24Hour(format)} = this.props;
+         const {mode, format = FORMATS[mode], minDate, maxDate, is24Hour = this._is24Hour(format)} = this.props;
         if (mode === 'date') {
           DatePickerAndroid.open({
             date: this.state.date,
-            // minDate: minDate && this.getDate(minDate),
-            // maxDate: maxDate && this.getDate(maxDate),
+            minDate: minDate && this.getDate(minDate),
+            maxDate: maxDate && this.getDate(maxDate),
             // mode: androidMode
           }).then(this._onDatePicked);
         } else if (mode === 'time') {
@@ -207,7 +207,7 @@ export default class DatePicker extends Component {
   }
 
   _onPressCancel() {
-    console.log('>>> DatePicker _onPressCancel()');
+    /* console.log('>>> DatePicker _onPressCancel()');
     const modal = this._modal;
     if (modal) {
       // iOS
@@ -216,7 +216,7 @@ export default class DatePicker extends Component {
     } else {
       // android
       console.log('>>> DatePicker _onPressCancel (android)');
-    }
+    } */
     // reset state
     /* this.setState({
       date: this.getDate(),
@@ -231,8 +231,9 @@ export default class DatePicker extends Component {
 */
 
   render() {
+    // TODO: use state to display ModalPicker
     console.log('>>> DatePicker render()');
-    const { mode, date, ...attributes } = this.props;
+    const { mode, date, minDate, maxDate, ...attributes } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this._onPressButton}>
         <View>
@@ -241,7 +242,7 @@ export default class DatePicker extends Component {
             {...attributes}
             value={this.getDateStr(date)}
           />
-           {Platform.OS === 'ios' && <ModalPicker
+          {Platform.OS === 'ios' && <ModalPicker
             ref={component => this._modal = component}
             onCancel={() => {
               console.log('>>> DatePicker ModalPicker onCancel');
@@ -254,8 +255,8 @@ export default class DatePicker extends Component {
             <DatePickerIOS
               date={this.state.date}
               mode={mode}
-              // minimumDate={minDate && this.getDate(minDate)}
-              // maximumDate={maxDate && this.getDate(maxDate)}
+              minimumDate={minDate && this.getDate(minDate)}
+              maximumDate={maxDate && this.getDate(maxDate)}
               onDateChange={this._onDateChange}
               // minuteInterval={minuteInterval}
               // timeZoneOffsetInMinutes={timeZoneOffsetInMinutes}
@@ -269,10 +270,4 @@ export default class DatePicker extends Component {
 }
 
 const styles = StyleSheet.create({
-  // TODO: export to modal
-  datePicker: {
-    marginTop: 42,
-    borderTopColor: colors.divider,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
 });
