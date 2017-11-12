@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#00000077',
   },
   pickerCon: {
-    // backgroundColor: '#fff',
-    backgroundColor: '#F9F9F9',
+    // backgroundColor: '#F9F9F9',
+    backgroundColor: colors.container,
     height: 0,
     overflow: 'hidden',
     // borderTopColor: '#B2B2B2',
